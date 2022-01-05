@@ -1,0 +1,32 @@
+start
+
+while (f:o){
+	read -f parameter
+		File fileinput= parameter;
+	read -o parameter
+		File fileouput=parameter;
+}
+
+while(1){
+	message to the user asking to choose scheduling method; //show message
+	getting user choose;	//get response
+	
+	case response:{
+	
+		response==1.
+			scheduling Method (None)
+			
+		response==2
+			Preemptive Mode(Off)
+			
+		response==3
+			Show Result
+			
+		response==4
+			End Program (break)
+			
+		other
+			ask again;
+	}
+
+}
