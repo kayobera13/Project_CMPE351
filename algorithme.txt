@@ -7,6 +7,8 @@ while (f:o){
 		File fileouput=parameter;
 }
 
+read input file;
+
 while(1){
 	message to the user asking to choose Action to do; //show message
 	getting user choice;	//get response
@@ -14,7 +16,7 @@ while(1){
 	case response:{
 	
 		response==1.{
-				//scheduling Method 
+				//scheduling Method Preemptive
 				
 				message to the user asking to choose scheduling method; //show message
 				getting user choice;	//get response_schedule_type
@@ -22,78 +24,93 @@ while(1){
 				case response_schedule_type:{
 				
 					response_schedule_type="None"
-						Action relative to scheduling method None;
+						Action relative to scheduling method None; //***Ne rien **//
 						
-					response_schedule_type="First Come, First Served Scheduling"
+					response_schedule_type="First Come, First Served Scheduling"{
 						Action relative to scheduling method First Come, First Served Scheduling;
-							tester=true;
-							time=0;
-							while(tester){
-								processesToExecute=arrivalTime(processes);
-								if(processesToExecute==-1){
-									tester=false;
-								}
-								else{
-									executionProcess(processes, processesToExecute, time);
-								}
-								time++;
-							}
+							schedulingpreemptive(processes,  1);
+					}
 						
-						
-					response_schedule_type="Shortest-Job-First Scheduling"
+					response_schedule_type="Shortest-Job-First Scheduling"{
 						Action relative to Shortest-Job-First Scheduling;
-							tester=true;
-							time=0;
-							while(tester){
-								processesToExecute=shortestJob(processes);
-								if(processesToExecute==-1){
-									tester=false;
-								}
-								else{
-									executionProcess(processes, processesToExecute, time);
-								}
-								time++;
-							}
-						
-					response_schedule_type="Priority Scheduling"
-						Action relative to Priority Scheduling;
-									 
-							tester=true;
-							time=0;
-							while(tester){
-								processesToExecute=priority(processes);
-								if(processesToExecute==-1){
-									tester=false;
-								}
-								else{
-									executionProcess(processes, processesToExecute, time);
-								}
-								time++;
-							}
-						
-					response_schedule_type="Round-Robin Scheduling"
-						Action relative to Round-Robin Scheduling
+							schedulingpreemptive(processes,  0);
+					}
 					
+					response_schedule_type="Priority Scheduling"{
+						Action relative to Priority Scheduling;
+							schedulingpreemptive(processes,  2);
+					}	
+						
+					response_schedule_type="Round-Robin Scheduling"{
+						Action relative to Round-Robin Scheduling
+							user insert quantum;  //get from user
+							tester=true;
+							time=0;
+							processListSize=processes.length;
+							currentprocess=0;
+							while(tester){
+								for (int i=0; i<quantum; i++){
+									processesToExecute=shechedulingProcessChoice(processes, 1);
+									if(processesToExecute==-1){
+										tester=false;
+										break;
+									}
+									else if(processes[currentprocess][4]==1){
+										break;
+									}
+									else{
+										executionProcess(processes, currentprocess, time);
+									}
+									time++;
+								}
+								if(currentprocess<processListSize)
+									currentprocess++
+								else
+									currentprocess=0;
+								
+							}
+					}
 				}
 		}
 			//scheduling Method (None)
 				
 			
 		response==2 {
-			Preemptive Mode(Off)
-			time_start=0  //get current time
-				operation start
-				...
-				operation end
-			time_end //get current time
-			time=time_start -time_end
+			Preemptive Mode(Off)  or Non Preemptive
+					response_schedule_type="None"
+						Action relative to scheduling method None; //***Ne rien **//
+						
+					response_schedule_type="First Come, First Served Scheduling"{
+						Action relative to scheduling method First Come, First Served Scheduling;
+							schedulingNonPreemptive(processes,  1);
+					}
+						
+					response_schedule_type="Shortest-Job-First Scheduling"{
+						Action relative to Shortest-Job-First Scheduling;
+							schedulingNonPreemptive(processes,  0);
+					}
+					
+					response_schedule_type="Priority Scheduling"{
+						Action relative to Priority Scheduling;
+							schedulingNonPreemptive(processes,  2);
+					}	
 		}
 			
 		response==3{
 			Show Result
 			
 			a) average waiting time for all jobs
+				sum=0;
+				foreach(processses as process){
+					sum=sum+process[3];
+					print process[3];   //b) job waiting time
+				}
+				average=sum/processes.length;
+				
 			b) for each job waiting time
+			
+			
+			c) write in output;
 		
 		}
 			
@@ -108,16 +125,15 @@ while(1){
 }
 
 
-
-function priority(processes){
+function shechedulingProcessChoice(processes, type){
 	processSelected=-1;
-	lowestPriority=0;
+	lowestprocess=0;
 	counter=0;
 	boolProcessSelected=false;
 	foreach(processes as pp){
-		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[2]<lowestPriority))
+		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[type]<lowestprocess))
 		{
-				lowestPriority=pp[2];
+				lowestprocess=pp[type];
 				processSelected=counter;
 				boolProcessSelected=true;
 		}
@@ -126,39 +142,39 @@ function priority(processes){
 	return processSelected;
 }
 
-function arrivalTime(processes){
-	processSelected=-1;
-	lowestArrival=0;
-	counter=0;
-	boolProcessSelected=false;
-	foreach(processes as pp){
-		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[1]<lowestArrival))
-		{
-				lowestArrival=pp[1];
-				processSelected=counter;
-				boolProcessSelected=true;
+function schedulingpreemptive(processes,  type){
+	tester=true;
+	time=0;
+	while(tester){
+		processesToExecute=shechedulingProcessChoice(processes, type);
+		if(processesToExecute==-1){
+			tester=false;
 		}
-		counter++;
+		else{
+			executionProcess(processes, processesToExecute, time);
+		}
+		time++;
 	}
-	return processSelected;
 }
 
-function shortestJob(processes){
-	processSelected=-1;
-	lowestJob=0;
-	counter=0;
-	boolProcessSelected=false;
-	foreach(processes as pp){
-		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[0]<lowestJob))
-		{
-				lowestJob=pp[0];
-				processSelected=counter;
-				boolProcessSelected=true;
+function schedulingNonPreemptive(processes,  type){
+	tester=true;
+	time=0;
+	processesToExecute=shechedulingProcessChoice(processes, type);
+	while(tester){	
+		if(processesToExecute==-1){
+			tester=false;
 		}
-		counter++;
+		else{
+			if(processes[processesToExecute][4]==1){
+				processesToExecute=shechedulingProcessChoice(processes, type);
+			}
+			executionProcess(processes, processesToExecute, time);
+		}
+		time++;
 	}
-	return processSelected;
 }
+
 
 
 function executionProcess(processes, processesToExecute, time){
@@ -183,7 +199,7 @@ function executionProcess(processes, processesToExecute, time){
 
 
 
-
+/////////////////////////////////////////End Algorithm///////////////
 
 
 
@@ -241,11 +257,11 @@ in_queue 0 not in queue 1 in queue					5
 //Priority
 processes={
 	
-	p1 ={5, 0, 3, 0, 0, 0} 
-	 p2 ={4, 1, 2, 0, 0, 0}
-	p3 ={3, 1, 1, 0, 0, 0} 
-	p4 ={4, 2, 2, 0, 0, 0} 
-	p3 ={3, 3, 1, 0, 0, 0} 
+	p1 ={5, 0, 3, 0, 0, 0} 0  1			quantum=3
+	p2 ={4, 1, 2, 0, 0, 0} 0  1
+	p3 ={3, 1, 1, 0, 0, 0} 0  1
+	p4 ={4, 2, 2, 0, 0, 0} 0  1
+  	p3 ={3, 3, 1, 0, 0, 0} 0  1
 }
 		 0  1  2   3  4  5
 		 
@@ -346,7 +362,7 @@ for(int i=0; i< total[execution_time]; i++){
 4:2:2		10
 3:3:1		3
 
-
+				Preemptive
 //Priority
 3:1:1    	0-2		0						10:31 - 32  -33  -34
 3:3:1		3-6		1								   10:33	 -35  -36  -37
@@ -354,6 +370,14 @@ for(int i=0; i< total[execution_time]; i++){
 4:2:2		12-16	9							  10:32										  -42 - 43 -44- 45	
 5:0:3		17-22	14				10:30 -31																	-46-47-48-49
 
+
+
+				Non Preemptive
+3:1:1    	0-2		0									10:36 - 37  -38  -39
+3:3:1		3-6		1												 	  10:33	 -35  -36  -37
+4:1:2		7-11	6												  	  10:340-41-42		    			      -38 -39 -40 -41
+4:2:2		12-16	9													  10:32										  -42 - 43 -44- 45	
+5:0:3		17-22	14				10:30 -31-32-33-34-35																	-46-47-48-49
 
 tab exec_time= 		5  4  3  4  3		3 3 4 4 5
 tab time_arrive =	0  1  1  2  3		1 3 1 2 0
