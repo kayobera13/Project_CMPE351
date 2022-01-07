@@ -26,9 +26,34 @@ while(1){
 						
 					response_schedule_type="First Come, First Served Scheduling"
 						Action relative to scheduling method First Come, First Served Scheduling;
+							tester=true;
+							time=0;
+							while(tester){
+								processesToExecute=arrivalTime(processes);
+								if(processesToExecute==-1){
+									tester=false;
+								}
+								else{
+									executionProcess(processes, processesToExecute, time);
+								}
+								time++;
+							}
+						
 						
 					response_schedule_type="Shortest-Job-First Scheduling"
 						Action relative to Shortest-Job-First Scheduling;
+							tester=true;
+							time=0;
+							while(tester){
+								processesToExecute=shortestJob(processes);
+								if(processesToExecute==-1){
+									tester=false;
+								}
+								else{
+									executionProcess(processes, processesToExecute, time);
+								}
+								time++;
+							}
 						
 					response_schedule_type="Priority Scheduling"
 						Action relative to Priority Scheduling;
@@ -83,6 +108,7 @@ while(1){
 }
 
 
+
 function priority(processes){
 	processSelected=-1;
 	lowestPriority=0;
@@ -99,6 +125,41 @@ function priority(processes){
 	}
 	return processSelected;
 }
+
+function arrivalTime(processes){
+	processSelected=-1;
+	lowestArrival=0;
+	counter=0;
+	boolProcessSelected=false;
+	foreach(processes as pp){
+		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[1]<lowestArrival))
+		{
+				lowestArrival=pp[1];
+				processSelected=counter;
+				boolProcessSelected=true;
+		}
+		counter++;
+	}
+	return processSelected;
+}
+
+function shortestJob(processes){
+	processSelected=-1;
+	lowestJob=0;
+	counter=0;
+	boolProcessSelected=false;
+	foreach(processes as pp){
+		if((boolProcessSelected=false && pp[5]==1) || (boolProcessSelected=true and pp[5]==1 and pp[4]==0 and pp[0]<lowestJob))
+		{
+				lowestJob=pp[0];
+				processSelected=counter;
+				boolProcessSelected=true;
+		}
+		counter++;
+	}
+	return processSelected;
+}
+
 
 function executionProcess(processes, processesToExecute, time){
 	counter=0;
