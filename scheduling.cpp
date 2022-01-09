@@ -8,16 +8,30 @@ struct processStructure {
     int processus[6];
 };
 
-void executionProcess(processStructure *eProcesses, int eProcessTE, int etime){
+void insertInqueue(processStructure *scProcesses, int etime){
+	for(int i=0; i<5; i++){
+	//	cout<<scProcesses[i].processus[0]<<"\n";
+		int *process = scProcesses[i].processus;
+		if(process[5]==0 && process[1]==etime){
+			process[5]=1;
+			cout<<i<<" In queue \n";
+		}
+	}
+}
+
+void executionProcess(processStructure *eProcesses, int eProcessTE){
 	int counter=0; 
 	cout<<"executionProcess start\n";
 	for(int i=0; i<5; i++){
+		
 		int *process = eProcesses[i].processus;
 		if (i==eProcessTE && process[4]==0){
 			process[0]=process[0]-1;
+			cout<<process[0]<<"Process \n";
 			if(process[0]==0){
-					process[4]==1;
-				}
+					process[4]=1;
+			}
+			cout<<process[4]<<"End \n";
 		}else{
 			process[3]=process[3]+1;
 		}
@@ -36,6 +50,8 @@ void executionProcess(processStructure *eProcesses, int eProcessTE, int etime){
 		}*/
 		counter++;
 	}
+	int c;
+	cin>>c;
 }
 
 int schedulingProcessChoice(processStructure *scProcesses, int type){
@@ -48,8 +64,9 @@ int schedulingProcessChoice(processStructure *scProcesses, int type){
 	for(int i=0; i<5; i++){
 	//	cout<<scProcesses[i].processus[0]<<"\n";
 		int *process = scProcesses[i].processus;
-		if((boolProcessSelected==false && process[5]==0) || 
-			(boolProcessSelected==true && process[4]==0 && process[type]<lowestProcess))
+		
+		if((boolProcessSelected==false && process[5]==1 && process[4]==0) || 
+			(boolProcessSelected==true && process[5]==1 && process[4]==0 && process[type]<lowestProcess))
 		{
 				lowestProcess=process[type];
 				processSelected=counter;
@@ -57,8 +74,10 @@ int schedulingProcessChoice(processStructure *scProcesses, int type){
 		}
 		counter++;
 	}
+	cout<<processSelected<<"selected \n";
 	return processSelected;
 }
+
 
 
 void schedulingPreemptive(processStructure *pProcesses, int type){
@@ -66,14 +85,40 @@ void schedulingPreemptive(processStructure *pProcesses, int type){
 	int time=0;
 	cout<<"schedulingPreemptive start\n";
 	while(tester==true){
+		insertInqueue(pProcesses, time);
 		int processesToExecute=schedulingProcessChoice(pProcesses, type);
 		if(processesToExecute==-1){
 			tester=false;
 		}
 		else{
-			executionProcess(pProcesses, processesToExecute, time);
+			executionProcess(pProcesses, processesToExecute);
+			time++;
 		}
-		time++;
+		
+	}
+	cout<<"Scheduling Finish\n";
+	cout<<time<<"time\n";
+}
+
+void schedulingNonPreemptive(processStructure *pProcesses, int type){
+	bool tester=true;
+	int time=0;
+	cout<<"schedulingNonPreemptive start\n";
+	insertInqueue(pProcesses, time);
+	while(tester==true){
+		int processesToExecute=schedulingProcessChoice(pProcesses, type);
+		if(processesToExecute==-1){
+			tester=false;
+		}
+		else{
+			int *process = pProcesses[processesToExecute].processus;
+			while(process[4]==0){
+				executionProcess(pProcesses, processesToExecute);
+				time++;
+				insertInqueue(pProcesses, time);
+			}
+			cout<<process[4]<<"Finish\n";
+		}
 	}
 	cout<<"Scheduling Finish\n";
 	cout<<time<<"time\n";
@@ -115,15 +160,15 @@ processStructure processes[5]={
 		
 		switch(userAction){
 			case 1:
-				int schedulingType;
+				int preemptiveSchedulingType;
 				cout<<"Choose Between the five Scheduling Preemptinve Type \n";
 				cout<<"1. None\n";
 				cout<<"2. First Come, First Served Scheduling\n";
 				cout<<"3. Shortest-Job-First Scheduling\n";
 				cout<<"4. Priority Scheduling\n";
 				cout<<"5. Round-Robin Scheduling\n";
-				cin>>schedulingType;
-				switch(schedulingType){
+				cin>>preemptiveSchedulingType;
+				switch(preemptiveSchedulingType){
 					case 1:
 						cout<<"None\n";
 						break;
@@ -143,10 +188,40 @@ processStructure processes[5]={
 					case 5:
 						cout<<"Round-Robin Scheduling\n";
 						break;
+					default:
+						cout<<"you have to choose between 1 - 5";
+					break;
 				}
 				break;
 			case 2:
-				cout<<"case 2";
+				int nonPreemptiveSchedulingType;
+				cout<<"Choose Between the five Scheduling Non Preemptinve Type \n";
+				cout<<"1. None\n";
+				cout<<"2. First Come, First Served Scheduling\n";
+				cout<<"3. Shortest-Job-First Scheduling\n";
+				cout<<"4. Priority Scheduling\n";
+				cin>>nonPreemptiveSchedulingType;
+				switch(nonPreemptiveSchedulingType){
+					case 1:
+						cout<<"None\n";
+						break;
+					case 2:
+						cout<<"First Come, First Served Scheduling\n";
+						schedulingNonPreemptive(processes, 1);
+						
+						break;
+					case 3:
+						cout<<"Shortest-Job-First Scheduling\n";
+						schedulingNonPreemptive(processes, 0);
+						break;
+					case 4:
+						cout<<"Priority Scheduling\n";
+						schedulingNonPreemptive(processes, 2);
+						break;
+					default:
+						cout<<"you have to choose between 1 - 4";
+					break;
+				}
 				break;
 			case 3:
 				cout<<"case 3";
