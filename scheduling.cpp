@@ -14,26 +14,29 @@ void insertInqueue(processStructure *scProcesses, int etime){
 		int *process = scProcesses[i].processus;
 		if(process[5]==0 && process[1]==etime){
 			process[5]=1;
-			cout<<i<<" In queue \n";
+			//cout<<i<<" In queue \n";
 		}
 	}
 }
 
 void executionProcess(processStructure *eProcesses, int eProcessTE){
 	int counter=0; 
-	cout<<"executionProcess start\n";
+	//cout<<"executionProcess start\n";
 	for(int i=0; i<5; i++){
 		
 		int *process = eProcesses[i].processus;
 		if (i==eProcessTE && process[4]==0){
 			process[0]=process[0]-1;
-			cout<<process[0]<<"Process \n";
+			//cout<<process[0]<<"Process \n";
 			if(process[0]==0){
 					process[4]=1;
 			}
-			cout<<process[4]<<"End \n";
-		}else{
+			//cout<<process[4]<<"End \n";
+		}else if(process[5]==1 && process[4]==0){
 			process[3]=process[3]+1;
+			//cout<<process[3]<<"Waiting \n";
+		}else{
+			
 		}
 		
 		/*if(process[5]==0 && process[1]>=etime){
@@ -50,8 +53,8 @@ void executionProcess(processStructure *eProcesses, int eProcessTE){
 		}*/
 		counter++;
 	}
-	int c;
-	cin>>c;
+	//int c;
+	//cin>>c;
 }
 
 int schedulingProcessChoice(processStructure *scProcesses, int type){
@@ -59,7 +62,7 @@ int schedulingProcessChoice(processStructure *scProcesses, int type){
 	int lowestProcess = 0;
 	int counter=0;
 	bool boolProcessSelected =false;
-	cout<<"schedulingProcessChoice start\n";
+	//cout<<"schedulingProcessChoice start\n";
 	//cout<<sizeof(scProcesses)<<"\n";
 	for(int i=0; i<5; i++){
 	//	cout<<scProcesses[i].processus[0]<<"\n";
@@ -74,7 +77,7 @@ int schedulingProcessChoice(processStructure *scProcesses, int type){
 		}
 		counter++;
 	}
-	cout<<processSelected<<"selected \n";
+	//cout<<processSelected<<"selected \n";
 	return processSelected;
 }
 
@@ -117,11 +120,71 @@ void schedulingNonPreemptive(processStructure *pProcesses, int type){
 				time++;
 				insertInqueue(pProcesses, time);
 			}
-			cout<<process[4]<<"Finish\n";
+			//cout<<process[4]<<"Finish\n";
 		}
 	}
 	cout<<"Scheduling Finish\n";
 	cout<<time<<"time\n";
+}
+
+void schedulingRoundRobin(processStructure *pProcesses, int quantum){
+	bool tester=true;
+	int time=0;
+	cout<<"schedulingRoundRobin start\n";
+	//insertInqueue(pProcesses, time);
+	int processListSize=5;
+	int currentprocess=0;
+	while(tester==true){
+		for(int i=0; i<quantum; i++){
+			int processesToExecute=schedulingProcessChoice(pProcesses, 1);
+			int *process = pProcesses[currentprocess].processus;
+			if(processesToExecute==-1){
+				tester=false;
+			}
+			else if(process[4]==1){
+				break;
+			}
+			else{
+				executionProcess(pProcesses, currentprocess);
+			}
+			time++;
+		}
+		if(currentprocess<processListSize){
+			currentprocess=0;
+		}else{
+			currentprocess=0;
+		}
+		
+		
+		/*else{
+			int *process = pProcesses[processesToExecute].processus;
+			int cQuantum=0;
+			while(quantum>cQuantum){
+				executionProcess(pProcesses, processesToExecute);
+				time++;
+				insertInqueue(pProcesses, time);
+				cQuantum++;
+			}
+			cout<<process[4]<<"Finish\n";
+		}*/
+	}
+	cout<<"Scheduling Finish\n";
+	cout<<time<<"time\n";
+}
+
+float getAverage(processStructure *pProcesses){
+	int sum=0;
+	for(int i=0; i<5; i++){
+		int *process = pProcesses[i].processus;
+		sum=sum+process[3];
+	}
+	return (sum/5);
+}
+void showWaitingTime(processStructure *pProcesses){
+	for(int i=0; i<5; i++){
+		int *process = pProcesses[i].processus;
+		cout<<"P"<<i+1<<": "<<process[3]<<"ms \n";
+	}
 }
 /*
 int p1[6]={5, 0, 3, 0, 0, 0};
@@ -175,7 +238,6 @@ processStructure processes[5]={
 					case 2:
 						cout<<"First Come, First Served Scheduling\n";
 						schedulingPreemptive(processes, 1);
-						
 						break;
 					case 3:
 						cout<<"Shortest-Job-First Scheduling\n";
@@ -187,6 +249,10 @@ processStructure processes[5]={
 						break;
 					case 5:
 						cout<<"Round-Robin Scheduling\n";
+						cout<<"Insert Quantum\n";
+						int quantum;
+						cin>>quantum;
+						schedulingRoundRobin(processes, quantum);
 						break;
 					default:
 						cout<<"you have to choose between 1 - 5";
@@ -224,13 +290,17 @@ processStructure processes[5]={
 				}
 				break;
 			case 3:
-				cout<<"case 3";
+				cout<<"The Result is:\n";
+				float average;
+				average= getAverage(processes);
+				showWaitingTime(processes);
+				cout<<"Average :"<<average<<"ms \n";
 				break;
 			case 4:
-				cout<<"case 4";
+				cout<<"Exit Program, Thank you  \n";
 				finish=true;
 				break;
-			default:
+			default: 
 				cout<<"you have to choose between 1 - 4";
 				break;
 		}
