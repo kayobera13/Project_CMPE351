@@ -1,6 +1,11 @@
 #include<iostream>
 #include <iterator>
 #include<algorithm>
+#include <GetOpt.h>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <string>
 using namespace std;
 
 struct processStructure {
@@ -194,22 +199,74 @@ int p4[6]={4, 2, 2, 0, 0, 0};
 int p5[6]={3, 3, 1, 0, 0, 0};
 */
 
-struct processStructure P1 = { {5, 0, 3, 0, 0, 0} };
-struct processStructure P2 = { {4, 1, 2, 0, 0, 0}};
-struct processStructure P3 = {{3, 1, 1, 0, 0, 0} };
-struct processStructure P4 = { {4, 2, 2, 0, 0, 0} };
-struct processStructure P5 = { {3, 3, 1, 0, 0, 0} };
 
-processStructure processes[5]={
-	P1,
-	P2,
-	P3,
-	P4,
-	P5
-};
+
+processStructure processes[]={};
+
+char *input=NULL;
+char *output=NULL;
   
-  int main ()
+  int main (int argc, char *argv[])
 {
+	int c;
+
+	if(argc<2){
+		cout<<"You should introduce 2 arguments";
+		exit(0);
+	}
+	
+	while((c = getopt(argc, argv, "u:o:")) != -1){
+		switch (c){
+			case 'u':
+				input=optarg;
+				break;
+			case 'o':
+				output=optarg;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	if(input==NULL || output==NULL){
+		cout<<"use the parameter u for input and o for output";
+		exit(0);
+	}
+	
+
+	std::ifstream file(input);
+	std::string str;
+	while(std::getline(file, str)){
+		vector<string> words{};
+		string delimiter=":";
+		cout<< str<<"\n";
+		int pos;
+		string text=str;
+		
+		while((pos = text.find(delimiter))!= string::npos){
+			words.push_back(text.substr(0, pos));
+			text.erase(0, pos+delimiter.length());
+		}
+		int p[6];
+		int count=0;
+		for(const auto &str :words){
+			cout<< str<<endl;
+			p[count]=stoi(str);
+			count++;
+		}
+		p[2]=stoi(text); p[3]=0; p[4]=0; p[5]=0;
+		cout<<text<<endl;
+		struct processStructure P1={p};
+		
+	}
+	
+	
+	cout<< input<<"\n";
+	cout<< output<<"\n";
+	
+	
+	
+	
 	int userAction;
 	int i=0;
 	bool finish=false;
