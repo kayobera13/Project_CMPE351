@@ -13,8 +13,8 @@ struct processStructure {
     int processus[6];
 };
 
-void insertInqueue(processStructure *scProcesses, int etime){
-	for(int i=0; i<5; i++){
+void insertInqueue(processStructure *scProcesses, int etime, int nbreline){
+	for(int i=0; i<nbreline; i++){
 	//	cout<<scProcesses[i].processus[0]<<"\n";
 		int *process = scProcesses[i].processus;
 		if(process[5]==0 && process[1]==etime){
@@ -24,10 +24,10 @@ void insertInqueue(processStructure *scProcesses, int etime){
 	}
 }
 
-void executionProcess(processStructure *eProcesses, int eProcessTE){
+void executionProcess(processStructure *eProcesses, int eProcessTE, int nbreline){
 	int counter=0; 
 	//cout<<"executionProcess start\n";
-	for(int i=0; i<5; i++){
+	for(int i=0; i<nbreline; i++){
 		
 		int *process = eProcesses[i].processus;
 		if (i==eProcessTE && process[4]==0){
@@ -62,14 +62,14 @@ void executionProcess(processStructure *eProcesses, int eProcessTE){
 	//cin>>c;
 }
 
-int schedulingProcessChoice(processStructure *scProcesses, int type){
+int schedulingProcessChoice(processStructure *scProcesses, int type, int nbreline){
 	int processSelected =-1;
 	int lowestProcess = 0;
 	int counter=0;
 	bool boolProcessSelected =false;
 	//cout<<"schedulingProcessChoice start\n";
 	//cout<<sizeof(scProcesses)<<"\n";
-	for(int i=0; i<5; i++){
+	for(int i=0; i<nbreline; i++){
 	//	cout<<scProcesses[i].processus[0]<<"\n";
 		int *process = scProcesses[i].processus;
 		
@@ -88,18 +88,18 @@ int schedulingProcessChoice(processStructure *scProcesses, int type){
 
 
 
-void schedulingPreemptive(processStructure *pProcesses, int type){
+void schedulingPreemptive(processStructure *pProcesses, int type, int nbreline){
 	bool tester=true;
 	int time=0;
 	cout<<"schedulingPreemptive start\n";
 	while(tester==true){
-		insertInqueue(pProcesses, time);
-		int processesToExecute=schedulingProcessChoice(pProcesses, type);
+		insertInqueue(pProcesses, time, nbreline);
+		int processesToExecute=schedulingProcessChoice(pProcesses, type, nbreline);
 		if(processesToExecute==-1){
 			tester=false;
 		}
 		else{
-			executionProcess(pProcesses, processesToExecute);
+			executionProcess(pProcesses, processesToExecute, nbreline);
 			time++;
 		}
 		
@@ -108,22 +108,22 @@ void schedulingPreemptive(processStructure *pProcesses, int type){
 	cout<<time<<"time\n";
 }
 
-void schedulingNonPreemptive(processStructure *pProcesses, int type){
+void schedulingNonPreemptive(processStructure *pProcesses, int type, int nbreline){
 	bool tester=true;
 	int time=0;
 	cout<<"schedulingNonPreemptive start\n";
-	insertInqueue(pProcesses, time);
+	insertInqueue(pProcesses, time,nbreline);
 	while(tester==true){
-		int processesToExecute=schedulingProcessChoice(pProcesses, type);
+		int processesToExecute=schedulingProcessChoice(pProcesses, type, nbreline);
 		if(processesToExecute==-1){
 			tester=false;
 		}
 		else{
 			int *process = pProcesses[processesToExecute].processus;
 			while(process[4]==0){
-				executionProcess(pProcesses, processesToExecute);
+				executionProcess(pProcesses, processesToExecute, nbreline);
 				time++;
-				insertInqueue(pProcesses, time);
+				insertInqueue(pProcesses, time, nbreline);
 			}
 			//cout<<process[4]<<"Finish\n";
 		}
@@ -132,7 +132,7 @@ void schedulingNonPreemptive(processStructure *pProcesses, int type){
 	cout<<time<<"time\n";
 }
 
-void schedulingRoundRobin(processStructure *pProcesses, int quantum){
+void schedulingRoundRobin(processStructure *pProcesses, int quantum, int nbreline){
 	bool tester=true;
 	int time=0;
 	cout<<"schedulingRoundRobin start\n";
@@ -141,7 +141,7 @@ void schedulingRoundRobin(processStructure *pProcesses, int quantum){
 	int currentprocess=0;
 	while(tester==true){
 		for(int i=0; i<quantum; i++){
-			int processesToExecute=schedulingProcessChoice(pProcesses, 1);
+			int processesToExecute=schedulingProcessChoice(pProcesses, 1, nbreline);
 			int *process = pProcesses[currentprocess].processus;
 			if(processesToExecute==-1){
 				tester=false;
@@ -150,7 +150,7 @@ void schedulingRoundRobin(processStructure *pProcesses, int quantum){
 				break;
 			}
 			else{
-				executionProcess(pProcesses, currentprocess);
+				executionProcess(pProcesses, currentprocess, nbreline);
 			}
 			time++;
 		}
@@ -177,31 +177,21 @@ void schedulingRoundRobin(processStructure *pProcesses, int quantum){
 	cout<<time<<"time\n";
 }
 
-float getAverage(processStructure *pProcesses){
+float getAverage(processStructure *pProcesses, int nbreline){
 	int sum=0;
-	for(int i=0; i<5; i++){
+	for(int i=0; i<nbreline; i++){
 		int *process = pProcesses[i].processus;
 		sum=sum+process[3];
 	}
 	return (sum/5);
 }
-void showWaitingTime(processStructure *pProcesses){
-	for(int i=0; i<5; i++){
+void showWaitingTime(processStructure *pProcesses, int nbreline){
+	for(int i=0; i<nbreline; i++){
 		int *process = pProcesses[i].processus;
 		cout<<"P"<<i+1<<": "<<process[3]<<"ms \n";
 	}
 }
-/*
-int p1[6]={5, 0, 3, 0, 0, 0};
-int p2[6]={4, 1, 2, 0, 0, 0};
-int p3[6]={3, 1, 1, 0, 0, 0};
-int p4[6]={4, 2, 2, 0, 0, 0};
-int p5[6]={3, 3, 1, 0, 0, 0};
-*/
 
-
-
-processStructure processes[]={};
 
 char *input=NULL;
 char *output=NULL;
@@ -232,14 +222,15 @@ char *output=NULL;
 		cout<<"use the parameter u for input and o for output";
 		exit(0);
 	}
-	
+	int nbreofline=0;
+	vector<processStructure> tempArray{};
 
 	std::ifstream file(input);
 	std::string str;
 	while(std::getline(file, str)){
 		vector<string> words{};
 		string delimiter=":";
-		cout<< str<<"\n";
+		//cout<< str<<"\n";
 		int pos;
 		string text=str;
 		
@@ -250,16 +241,23 @@ char *output=NULL;
 		int p[6];
 		int count=0;
 		for(const auto &str :words){
-			cout<< str<<endl;
 			p[count]=stoi(str);
 			count++;
 		}
 		p[2]=stoi(text); p[3]=0; p[4]=0; p[5]=0;
 		cout<<text<<endl;
-		struct processStructure P1={p};
-		
+		 processStructure S1={{p[0],p[1],p[2],p[3],p[4],p[5]}};
+		tempArray.push_back(S1);
+		nbreofline++;
 	}
 	
+	processStructure processes[nbreofline]={};
+	int j=0;
+	for(const auto &ar: tempArray){
+		processes[j]=ar;
+		j++;
+	}
+		
 	
 	cout<< input<<"\n";
 	cout<< output<<"\n";
@@ -294,22 +292,22 @@ char *output=NULL;
 						break;
 					case 2:
 						cout<<"First Come, First Served Scheduling\n";
-						schedulingPreemptive(processes, 1);
+						schedulingPreemptive(processes, 1, nbreofline);
 						break;
 					case 3:
 						cout<<"Shortest-Job-First Scheduling\n";
-						schedulingPreemptive(processes, 0);
+						schedulingPreemptive(processes, 0, nbreofline);
 						break;
 					case 4:
 						cout<<"Priority Scheduling\n";
-						schedulingPreemptive(processes, 2);
+						schedulingPreemptive(processes, 2, nbreofline);
 						break;
 					case 5:
 						cout<<"Round-Robin Scheduling\n";
 						cout<<"Insert Quantum\n";
 						int quantum;
 						cin>>quantum;
-						schedulingRoundRobin(processes, quantum);
+						schedulingRoundRobin(processes, quantum, nbreofline);
 						break;
 					default:
 						cout<<"you have to choose between 1 - 5";
@@ -326,20 +324,20 @@ char *output=NULL;
 				cin>>nonPreemptiveSchedulingType;
 				switch(nonPreemptiveSchedulingType){
 					case 1:
-						cout<<"None\n";
+						cout<<"None Scheduling method choosen try again \n";
 						break;
 					case 2:
 						cout<<"First Come, First Served Scheduling\n";
-						schedulingNonPreemptive(processes, 1);
+						schedulingNonPreemptive(processes, 1, nbreofline);
 						
 						break;
 					case 3:
 						cout<<"Shortest-Job-First Scheduling\n";
-						schedulingNonPreemptive(processes, 0);
+						schedulingNonPreemptive(processes, 0, nbreofline);
 						break;
 					case 4:
 						cout<<"Priority Scheduling\n";
-						schedulingNonPreemptive(processes, 2);
+						schedulingNonPreemptive(processes, 2, nbreofline);
 						break;
 					default:
 						cout<<"you have to choose between 1 - 4";
@@ -349,8 +347,8 @@ char *output=NULL;
 			case 3:
 				cout<<"The Result is:\n";
 				float average;
-				average= getAverage(processes);
-				showWaitingTime(processes);
+				average= getAverage(processes, nbreofline);
+				showWaitingTime(processes, nbreofline);
 				cout<<"Average :"<<average<<"ms \n";
 				break;
 			case 4:
