@@ -192,6 +192,19 @@ void showWaitingTime(processStructure *pProcesses, int nbreline){
 	}
 }
 
+void writeFile(string output){
+// Create and open a text file
+					 ofstream file;
+					 file.open(output);
+					  
+					cout<<"ENTER YOUR MESSAGE";
+
+					  file<<"Average :"<<"ms \n";
+
+					  //We need to close every file which you open.
+					  file.close();	
+}
+
 
 char *input=NULL;
 char *output=NULL;
@@ -261,7 +274,7 @@ char *output=NULL;
 	
 	cout<< input<<"\n";
 	cout<< output<<"\n";
-	
+
 	
 	
 	
@@ -353,6 +366,13 @@ char *output=NULL;
 				break;
 			case 4:
 				cout<<"Exit Program, Thank you  \n";
+				float averages;
+				average= getAverage(processes, nbreofline);
+				showWaitingTime(processes, nbreofline);
+				cout<<"Average :"<<average<<"ms \n";
+				writeFile(output);
+				 	
+					
 				finish=true;
 				break;
 			default: 
