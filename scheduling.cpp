@@ -1,7 +1,8 @@
+#include <vector>
 #include<iostream>
 #include <iterator>
 #include<algorithm>
-#include <GetOpt.h>
+#include <getopt.h>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -136,8 +137,8 @@ void schedulingRoundRobin(processStructure *pProcesses, int quantum, int nbrelin
 	bool tester=true;
 	int time=0;
 	cout<<"schedulingRoundRobin start\n";
-	//insertInqueue(pProcesses, time);
-	int processListSize=5;
+	insertInqueue(pProcesses, time, nbreline);
+	int processListSize=nbreline;
 	int currentprocess=0;
 	while(tester==true){
 		for(int i=0; i<quantum; i++){
@@ -145,36 +146,23 @@ void schedulingRoundRobin(processStructure *pProcesses, int quantum, int nbrelin
 			int *process = pProcesses[currentprocess].processus;
 			if(processesToExecute==-1){
 				tester=false;
+				break;
 			}
 			else if(process[4]==1){
 				break;
 			}
 			else{
 				executionProcess(pProcesses, currentprocess, nbreline);
-			}
-			time++;
-		}
-		if(currentprocess<processListSize){
-			currentprocess=0;
-		}else{
-			currentprocess=0;
-		}
-		
-		
-		/*else{
-			int *process = pProcesses[processesToExecute].processus;
-			int cQuantum=0;
-			while(quantum>cQuantum){
-				executionProcess(pProcesses, processesToExecute);
+				insertInqueue(pProcesses, time, nbreline);
 				time++;
-				insertInqueue(pProcesses, time);
-				cQuantum++;
 			}
-			cout<<process[4]<<"Finish\n";
-		}*/
+			
+		}
+		currentprocess++;
+		if(currentprocess==processListSize){
+			currentprocess=0;
+		}
 	}
-	cout<<"Scheduling Finish\n";
-	cout<<time<<"time\n";
 }
 
 float getAverage(processStructure *pProcesses, int nbreline){
@@ -192,17 +180,18 @@ void showWaitingTime(processStructure *pProcesses, int nbreline){
 	}
 }
 
+
 void writeFile(string output){
 // Create and open a text file
-					 ofstream file;
-					 file.open(output);
+	ofstream files;
+	files.open(output);
 					  
-					cout<<"ENTER YOUR MESSAGE";
+	cout<<"ENTER YOUR MESSAGE";
 
-					  file<<"Average :"<<"ms \n";
+	files<<"Average :"<<"ms \n";
 
 					  //We need to close every file which you open.
-					  file.close();	
+	files.close();	
 }
 
 
@@ -218,9 +207,9 @@ char *output=NULL;
 		exit(0);
 	}
 	
-	while((c = getopt(argc, argv, "u:o:")) != -1){
+	while((c = getopt(argc, argv, "f:o:")) != -1){
 		switch (c){
-			case 'u':
+			case 'f':
 				input=optarg;
 				break;
 			case 'o':
@@ -258,24 +247,17 @@ char *output=NULL;
 			count++;
 		}
 		p[2]=stoi(text); p[3]=0; p[4]=0; p[5]=0;
-		cout<<text<<endl;
 		 processStructure S1={{p[0],p[1],p[2],p[3],p[4],p[5]}};
 		tempArray.push_back(S1);
 		nbreofline++;
 	}
 	
-	processStructure processes[nbreofline]={};
+	processStructure processes[nbreofline];
 	int j=0;
 	for(const auto &ar: tempArray){
 		processes[j]=ar;
 		j++;
-	}
-		
-	
-	cout<< input<<"\n";
-	cout<< output<<"\n";
-
-	
+	}	
 	
 	
 	int userAction;
@@ -290,7 +272,7 @@ char *output=NULL;
 		cin>>userAction;
 		
 		switch(userAction){
-			case 1:
+			case 1:{
 				int preemptiveSchedulingType;
 				cout<<"Choose Between the five Scheduling Preemptinve Type \n";
 				cout<<"1. None\n";
@@ -326,8 +308,10 @@ char *output=NULL;
 						cout<<"you have to choose between 1 - 5";
 					break;
 				}
+				
+			}
 				break;
-			case 2:
+			case 2:{
 				int nonPreemptiveSchedulingType;
 				cout<<"Choose Between the five Scheduling Non Preemptinve Type \n";
 				cout<<"1. None\n";
@@ -356,24 +340,42 @@ char *output=NULL;
 						cout<<"you have to choose between 1 - 4";
 					break;
 				}
+				
+			}
 				break;
-			case 3:
+			case 3:{
 				cout<<"The Result is:\n";
+				cout<<"Processes waiting Time \n";
 				float average;
 				average= getAverage(processes, nbreofline);
 				showWaitingTime(processes, nbreofline);
 				cout<<"Average :"<<average<<"ms \n";
+				}
+				
 				break;
-			case 4:
+			case 4:{
 				cout<<"Exit Program, Thank you  \n";
 				float averages;
-				average= getAverage(processes, nbreofline);
-				showWaitingTime(processes, nbreofline);
-				cout<<"Average :"<<average<<"ms \n";
-				writeFile(output);
+				averages= getAverage(processes, nbreofline);
+		
+				ofstream file;
+				file.open(output);
+									  
+				file<<"Processes waiting Time \n";
+				for(int i=0; i<nbreofline; i++){
+					int *process = processes[i].processus;
+					file<<"P"<<i+1<<": "<<process[3]<<"ms \n";
+				}
+
+				file<<"Average :"<< averages <<"ms \n";
+
+									  //We need to close every file which you open.
+				file.close();	
 				 	
 					
 				finish=true;
+			}
+				
 				break;
 			default: 
 				cout<<"you have to choose between 1 - 4";
